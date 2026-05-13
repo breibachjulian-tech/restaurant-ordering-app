@@ -1,9 +1,65 @@
-<html>
-    <head>
-       <link rel="stylesheet" href="index.css">
-    </head>
-    <body>
-	<script src="index.js"></script>
-    </body>
-</html>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jimmy's Diner</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div id="app">
 
+      <header class="hero">
+        <div class="hero-text">
+          <h1>Jimmy's Diner</h1>
+          <p>The best burgers and pizzas in town.</p>
+        </div>
+        <div class="hero-img">🍔</div>
+      </header>
+
+      <main>
+        <section id="menu"></section>
+
+        <section id="order" class="hidden">
+          <h2 class="order-heading">Your order</h2>
+          <div id="order-items"></div>
+          <div class="order-divider"></div>
+          <div class="order-total-row">
+            <span class="order-total-label">Total price:</span>
+            <span id="order-total" class="order-total-value"></span>
+          </div>
+          <button id="complete-order-btn" class="btn-complete">Complete order</button>
+        </section>
+
+        <div id="success" class="hidden success-box">
+          <p id="success-message"></p>
+        </div>
+      </main>
+
+    </div>
+
+    <!-- Payment modal -->
+    <dialog id="payment-modal">
+      <div class="modal-inner">
+        <h2 class="modal-title">Your payment details</h2>
+        <form id="payment-form" novalidate>
+          <div class="field">
+            <label for="input-name">Name</label>
+            <input id="input-name" name="name" type="text" placeholder="e.g. John Smith" required />
+          </div>
+          <div class="field">
+            <label for="input-card">Card number</label>
+            <input id="input-card" name="card-number" type="text" placeholder="e.g. 1234 5678 9012 3456" required />
+          </div>
+          <div class="field">
+            <label for="input-cvv">CVV</label>
+            <input id="input-cvv" name="cvv" type="text" placeholder="e.g. 123" required />
+          </div>
+          <button type="submit" class="btn-pay">Pay</button>
+        </form>
+      </div>
+    </dialog>
+
+    <script type="module" src="index.js"></script>
+  </body>
+</html>
