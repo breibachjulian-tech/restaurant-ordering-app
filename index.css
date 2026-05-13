@@ -56,12 +56,15 @@ body {
 .meal-deal-banner {
   background: #f0faf9;
   border-bottom: 1.5px solid #2ec4b6;
-  padding: 11px 20px;
+  padding: 10px 20px 12px;
   font-size: 0.82rem;
+  line-height: 1.5;
   color: #1a6e68;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  text-align: center;
 }
 
 .meal-deal-tag {
@@ -72,7 +75,6 @@ body {
   letter-spacing: 0.08em;
   padding: 3px 7px;
   border-radius: 4px;
-  flex-shrink: 0;
 }
 
 /* ── Menu ── */
