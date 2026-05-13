@@ -1,5 +1,6 @@
-import { menuArray } from './data.js'
+import { menuArray } from './data.js' // import menu items from data file
 
+// grab all DOM elements needed
 const menuEl = document.getElementById('menu')
 const orderSection = document.getElementById('order')
 const orderItemsEl = document.getElementById('order-items')
@@ -10,9 +11,9 @@ const paymentForm = document.getElementById('payment-form')
 const successEl = document.getElementById('success')
 const successMsg = document.getElementById('success-message')
 
-let order = []
+let order = [] // holds the items the customer has added
 
-// ── Render menu ──────────────────────────────────────────────
+// build and inject a menu item row for each item in menuArray
 function renderMenu() {
   menuEl.innerHTML = menuArray.map(item => `
     <div class="menu-item">
@@ -27,84 +28,101 @@ function renderMenu() {
   `).join('')
 }
 
-// ── Render order panel ───────────────────────────────────────
+// check if a food item (pizza/burger) AND beer are both in the order
+function getMealDeal() {
+  const foodItem = order.find(o => o.id === 0 || o.id === 1) // pizza or hamburger
+  const beer = order.find(o => o.id === 2) // beer
+  if (foodItem && beer) {
+    const discount = Math.round((foodItem.price + beer.price) * 0.15 * 100) / 100 // 15% off both items
+    return { active: true, discount }
+  }
+  return { active: false, discount: 0 } // no deal applies
+}
+
+// rebuild the order panel with current items, discount row (if any), and total
 function renderOrder() {
   if (order.length === 0) {
-    orderSection.classList.add('hidden')
+    orderSection.classList.add('hidden') // hide panel when cart is empty
     return
   }
 
-  orderSection.classList.remove('hidden')
+  orderSection.classList.remove('hidden') // show panel once an item is added
 
+  const { active, discount } = getMealDeal() // check whether meal deal is active
+
+  // render each ordered item with its price and a remove button
   orderItemsEl.innerHTML = order.map(item => `
     <div class="order-item-row">
       <div class="order-item-left">
         <span class="order-item-name">${item.name}</span>
-        <button class="btn-remove" data-id="${item.id}">remove</button>
+        <button class="btn-remove" data-id="${item.id}">Remove</button>
       </div>
       <span class="order-item-price">$${item.price}</span>
     </div>
-  `).join('')
+  `).join('') + (active ? `
+    <div class="order-discount-row">
+      <span class="order-discount-label">Meal Deal (15% off)</span>
+      <span class="order-discount-value">-$${discount.toFixed(2)}</span>
+    </div>
+  ` : '') // append discount row only when meal deal is active
 
-  const total = order.reduce((sum, item) => sum + item.price, 0)
-  orderTotalEl.textContent = `$${total}`
+  const subtotal = order.reduce((sum, item) => sum + item.price, 0) // sum all item prices
+  orderTotalEl.textContent = `$${(subtotal - discount).toFixed(2)}` // subtract discount from total
 }
 
-// ── Cart actions ─────────────────────────────────────────────
+// add item to order if not already present, then re-render
 function addItem(id) {
-  const item = menuArray.find(m => m.id === id)
-  if (!order.find(o => o.id === id)) {
-    order.push({ ...item })
+  const item = menuArray.find(m => m.id === id) // find the matching menu item
+  if (!order.find(o => o.id === id)) { // prevent duplicates
+    order.push({ ...item }) // add a copy to the order
   }
   renderOrder()
 }
 
+// remove item from order by id, then re-render
 function removeItem(id) {
   order = order.filter(o => o.id !== id)
   renderOrder()
 }
 
-// ── Event delegation — menu ──────────────────────────────────
+// listen for + button clicks on the menu using event delegation
 menuEl.addEventListener('click', e => {
-  const btn = e.target.closest('.btn-add')
+  const btn = e.target.closest('.btn-add') // find the clicked add button
   if (!btn) return
-  addItem(Number(btn.dataset.id))
+  addItem(Number(btn.dataset.id)) // parse id from data attribute and add item
 })
 
-// ── Event delegation — order panel ──────────────────────────
+// listen for remove button clicks inside the order panel
 orderItemsEl.addEventListener('click', e => {
   const btn = e.target.closest('.btn-remove')
   if (!btn) return
   removeItem(Number(btn.dataset.id))
 })
 
-// ── Open payment modal ───────────────────────────────────────
+// open payment modal and reset the form when complete order is clicked
 completeBtn.addEventListener('click', () => {
-  paymentForm.reset()
-  modal.showModal()
+  paymentForm.reset() // clear any previous input
+  modal.showModal() // open the native dialog
 })
 
-// ── Handle payment form submit ───────────────────────────────
+// handle payment form submission
 paymentForm.addEventListener('submit', e => {
-  e.preventDefault()
+  e.preventDefault() // stop default form navigation
+  if (!paymentForm.reportValidity()) return // trigger browser's built-in required field validation
 
-  // Trigger native browser validation
-  if (!paymentForm.reportValidity()) return
+  const name = document.getElementById('input-name').value.trim() // read the customer's name
 
-  const name = document.getElementById('input-name').value.trim()
-
-  modal.close()
-  orderSection.classList.add('hidden')
-  successEl.classList.remove('hidden')
+  modal.close() // close the payment modal
+  orderSection.classList.add('hidden') // hide the order panel
+  successEl.classList.remove('hidden') // show the success message
   successMsg.textContent = `Thanks, ${name}! The order is on its way!`
 
-  order = []
+  order = [] // reset the cart
 })
 
-// ── Close modal on backdrop click ────────────────────────────
+// close modal when clicking on the backdrop
 modal.addEventListener('click', e => {
-  if (e.target === modal) modal.close()
+  if (e.target === modal) modal.close() // only close when clicking outside the modal card
 })
 
-// ── Init ─────────────────────────────────────────────────────
-renderMenu()
+renderMenu() // kick off the app by rendering the menu on page load

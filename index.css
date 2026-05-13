@@ -52,6 +52,29 @@ body {
   margin-left: 12px;
 }
 
+/* ── Meal deal banner ── */
+.meal-deal-banner {
+  background: #f0faf9;
+  border-bottom: 1.5px solid #2ec4b6;
+  padding: 11px 20px;
+  font-size: 0.82rem;
+  color: #1a6e68;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.meal-deal-tag {
+  background: #2ec4b6;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 3px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
 /* ── Menu ── */
 #menu {
   flex: 1;
@@ -169,6 +192,25 @@ body {
   font-size: 0.95rem;
   font-weight: 500;
   color: #1a1a1a;
+}
+
+.order-discount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.order-discount-label {
+  font-size: 0.85rem;
+  color: #2ec4b6;
+  font-weight: 600;
+}
+
+.order-discount-value {
+  font-size: 0.85rem;
+  color: #2ec4b6;
+  font-weight: 600;
 }
 
 .order-divider {
