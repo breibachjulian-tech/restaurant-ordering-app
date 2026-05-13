@@ -39,6 +39,26 @@
         <div id="success" class="hidden success-box">
           <p id="success-message"></p>
         </div>
+
+        <!-- Review section shown after a successful order -->
+        <div id="review" class="hidden review-box">
+          <h3 class="review-heading">How was your experience?</h3>
+          <p class="review-subtext">Your feedback helps us improve for every customer.</p>
+          <div id="star-rating" class="star-rating">
+            <span class="star" data-value="1">★</span>
+            <span class="star" data-value="2">★</span>
+            <span class="star" data-value="3">★</span>
+            <span class="star" data-value="4">★</span>
+            <span class="star" data-value="5">★</span>
+          </div>
+          <textarea id="review-text" class="review-textarea" placeholder="Tell us about your experience..." rows="3"></textarea>
+          <button id="submit-review-btn" class="btn-submit-review">Submit review</button>
+        </div>
+
+        <!-- Confirmation shown after the review is submitted -->
+        <div id="review-thanks" class="hidden review-thanks-box">
+          <p>Thank you for your feedback — we really appreciate it!</p>
+        </div>
       </main>
 
     </div>

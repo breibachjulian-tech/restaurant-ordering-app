@@ -10,8 +10,15 @@ const modal = document.getElementById('payment-modal')
 const paymentForm = document.getElementById('payment-form')
 const successEl = document.getElementById('success')
 const successMsg = document.getElementById('success-message')
+const reviewEl = document.getElementById('review')
+const reviewThanksEl = document.getElementById('review-thanks')
+const starRatingEl = document.getElementById('star-rating')
+const starEls = document.querySelectorAll('.star') // all 5 star spans
+const reviewTextEl = document.getElementById('review-text')
+const submitReviewBtn = document.getElementById('submit-review-btn')
 
 let order = [] // holds the items the customer has added
+let selectedRating = 0 // tracks the star rating the customer has clicked
 
 // build and inject a menu item row for each item in menuArray
 function renderMenu() {
@@ -116,13 +123,49 @@ paymentForm.addEventListener('submit', e => {
   orderSection.classList.add('hidden') // hide the order panel
   successEl.classList.remove('hidden') // show the success message
   successMsg.textContent = `Thanks, ${name}! The order is on its way!`
+  reviewEl.classList.remove('hidden') // reveal the review section below the success message
 
   order = [] // reset the cart
+  selectedRating = 0 // reset the star rating for next order
+  setStarLit(0) // clear any lit stars from a previous session
 })
 
 // close modal when clicking on the backdrop
 modal.addEventListener('click', e => {
   if (e.target === modal) modal.close() // only close when clicking outside the modal card
+})
+
+// light up all stars up to the given value, clear the rest
+function setStarLit(upTo) {
+  starEls.forEach(star => {
+    star.classList.toggle('star--lit', Number(star.dataset.value) <= upTo)
+  })
+}
+
+// hover over a star: preview the rating by lighting up stars temporarily
+starRatingEl.addEventListener('mouseover', e => {
+  const star = e.target.closest('.star')
+  if (!star) return
+  setStarLit(Number(star.dataset.value))
+})
+
+// mouse leaves the star group: revert to the locked selection
+starRatingEl.addEventListener('mouseleave', () => {
+  setStarLit(selectedRating)
+})
+
+// click a star: lock in the selected rating
+starRatingEl.addEventListener('click', e => {
+  const star = e.target.closest('.star')
+  if (!star) return
+  selectedRating = Number(star.dataset.value)
+  setStarLit(selectedRating) // keep the clicked stars lit
+})
+
+// submit review: hide the review form and show the thank you message
+submitReviewBtn.addEventListener('click', () => {
+  reviewEl.classList.add('hidden')
+  reviewThanksEl.classList.remove('hidden')
 })
 
 renderMenu() // kick off the app by rendering the menu on page load

@@ -344,7 +344,105 @@ dialog::backdrop {
   background: #25a99d;
 }
 
-/* ── Utility ── */
+/* Review section */
+.review-box {
+  margin: 0 20px 24px;
+  padding: 20px 24px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+}
+
+.review-heading {
+  margin: 0 0 4px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  text-align: center;
+}
+
+.review-subtext {
+  margin: 0 0 16px;
+  font-size: 0.8rem;
+  color: #aaa;
+  text-align: center;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.star {
+  font-size: 2rem;
+  color: #ddd;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.1s, transform 0.1s;
+}
+
+.star:hover {
+  transform: scale(1.15);
+}
+
+/* Lit state used for both hover preview and locked selection */
+.star--lit {
+  color: #f5a623;
+}
+
+.review-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 7px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  transition: border-color 0.15s;
+}
+
+.review-textarea:focus {
+  border-color: #2ec4b6;
+}
+
+.btn-submit-review {
+  width: 100%;
+  padding: 13px;
+  background: #2ec4b6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.15s;
+}
+
+.btn-submit-review:hover {
+  background: #25a99d;
+}
+
+/* Thank you message shown after review submission */
+.review-thanks-box {
+  margin: 0 20px 24px;
+  padding: 16px 24px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.review-thanks-box p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+/* Utility */
 .hidden {
   display: none !important;
 }
