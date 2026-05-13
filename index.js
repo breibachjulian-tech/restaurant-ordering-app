@@ -1,6 +1,5 @@
-import { menuArray } from './data.js' // import menu items from data file
+import { menuArray } from './data.js'
 
-// grab all DOM elements needed
 const menuEl = document.getElementById('menu')
 const orderSection = document.getElementById('order')
 const orderItemsEl = document.getElementById('order-items')
@@ -13,159 +12,203 @@ const successMsg = document.getElementById('success-message')
 const reviewEl = document.getElementById('review')
 const reviewThanksEl = document.getElementById('review-thanks')
 const starRatingEl = document.getElementById('star-rating')
-const starEls = document.querySelectorAll('.star') // all 5 star spans
+const starEls = document.querySelectorAll('.star')
 const reviewTextEl = document.getElementById('review-text')
 const submitReviewBtn = document.getElementById('submit-review-btn')
 
-let order = [] // holds the items the customer has added
-let selectedRating = 0 // tracks the star rating the customer has clicked
+let order = []
+let activeId = null  // which item's stepper is currently open
+let selectedRating = 0
 
-// build and inject a menu item row for each item in menuArray
 function renderMenu() {
-  menuEl.innerHTML = menuArray.map(item => `
-    <div class="menu-item">
-      <span class="menu-item-emoji">${item.emoji}</span>
-      <div class="menu-item-info">
-        <p class="menu-item-name">${item.name}</p>
-        <p class="menu-item-ingredients">${item.ingredients.join(', ')}</p>
-        <p class="menu-item-price">$${item.price}</p>
+  menuEl.innerHTML = menuArray.map(item => {
+    const orderItem = order.find(o => o.id === item.id)
+    const qty = orderItem ? orderItem.quantity : 0
+    const control = activeId === item.id
+      ? `<div class="qty-stepper">
+           <button class="btn-decrement" data-id="${item.id}" aria-label="Remove one ${item.name}">−</button>
+           <span class="qty-value" data-id="${item.id}">${qty}</span>
+           <button class="btn-increment" data-id="${item.id}" aria-label="Add one ${item.name}">+</button>
+         </div>`
+      : `<button class="btn-add" data-id="${item.id}" aria-label="Add ${item.name}">+</button>`
+    return `
+      <div class="menu-item">
+        <span class="menu-item-emoji">${item.emoji}</span>
+        <div class="menu-item-info">
+          <p class="menu-item-name">${item.name}</p>
+          <p class="menu-item-ingredients">${item.ingredients.join(', ')}</p>
+          <p class="menu-item-price">$${item.price}</p>
+        </div>
+        ${control}
       </div>
-      <button class="btn-add" data-id="${item.id}" aria-label="Add ${item.name}">+</button>
-    </div>
-  `).join('')
+    `
+  }).join('')
 }
 
-// check if a food item (pizza/burger) AND beer are both in the order
+// the deal applies to exactly 1 food unit + 1 beer unit regardless of quantities ordered
 function getMealDeal() {
-  const foodItem = order.find(o => o.id === 0 || o.id === 1) // pizza or hamburger
-  const beer = order.find(o => o.id === 2) // beer
+  const foodItem = order.find(o => o.id === 0 || o.id === 1)
+  const beer = order.find(o => o.id === 2)
   if (foodItem && beer) {
-    const discount = Math.round((foodItem.price + beer.price) * 0.15 * 100) / 100 // 15% off both items
+    const discount = Math.round((foodItem.price + beer.price) * 0.15 * 100) / 100
     return { active: true, discount }
   }
-  return { active: false, discount: 0 } // no deal applies
+  return { active: false, discount: 0 }
 }
 
-// rebuild the order panel with current items, discount row (if any), and total
 function renderOrder() {
   if (order.length === 0) {
-    orderSection.classList.add('hidden') // hide panel when cart is empty
+    orderSection.classList.add('hidden')
     return
   }
+  orderSection.classList.remove('hidden')
 
-  orderSection.classList.remove('hidden') // show panel once an item is added
+  const { active, discount } = getMealDeal()
 
-  const { active, discount } = getMealDeal() // check whether meal deal is active
-
-  // render each ordered item with its price and a remove button
   orderItemsEl.innerHTML = order.map(item => `
     <div class="order-item-row">
-      <div class="order-item-left">
-        <span class="order-item-name">${item.name}</span>
-        <button class="btn-remove" data-id="${item.id}">Remove</button>
+      <span class="order-item-name">${item.quantity > 1 ? `${item.quantity}× ` : ''}${item.name}</span>
+      <div class="order-item-right">
+        <span class="order-item-price">$${item.price * item.quantity}</span>
+        <button class="btn-order-decrement" data-id="${item.id}" aria-label="Remove one ${item.name}">−</button>
       </div>
-      <span class="order-item-price">$${item.price}</span>
     </div>
   `).join('') + (active ? `
     <div class="order-discount-row">
       <span class="order-discount-label">Meal Deal (15% off)</span>
       <span class="order-discount-value">-$${discount.toFixed(2)}</span>
     </div>
-  ` : '') // append discount row only when meal deal is active
+  ` : '')
 
-  const subtotal = order.reduce((sum, item) => sum + item.price, 0) // sum all item prices
-  orderTotalEl.textContent = `$${(subtotal - discount).toFixed(2)}` // subtract discount from total
+  const subtotal = order.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  orderTotalEl.textContent = `$${(subtotal - discount).toFixed(2)}`
 }
 
-// add item to order if not already present, then re-render
-function addItem(id) {
-  const item = menuArray.find(m => m.id === id) // find the matching menu item
-  if (!order.find(o => o.id === id)) { // prevent duplicates
-    order.push({ ...item }) // add a copy to the order
+// Open stepper for this item (folds any other open stepper), adds 1 unit — full re-render
+function openItem(id) {
+  activeId = id
+  const existing = order.find(o => o.id === id)
+  if (existing) {
+    existing.quantity++
+  } else {
+    const item = menuArray.find(m => m.id === id)
+    order.push({ ...item, quantity: 1 })
+  }
+  renderMenu()
+  renderOrder()
+}
+
+// Increment within the already-open stepper — targeted DOM update only, no re-render
+function incrementItem(id) {
+  const existing = order.find(o => o.id === id)
+  if (!existing) return
+  existing.quantity++
+  menuEl.querySelector(`.qty-value[data-id="${id}"]`).textContent = existing.quantity
+  renderOrder()
+}
+
+// Decrement from the order panel — keeps menu stepper in sync without triggering its animation
+function decrementFromOrder(id) {
+  const existing = order.find(o => o.id === id)
+  if (!existing) return
+  if (existing.quantity > 1) {
+    existing.quantity--
+    const menuQtyEl = menuEl.querySelector(`.qty-value[data-id="${id}"]`)
+    if (menuQtyEl) menuQtyEl.textContent = existing.quantity
+  } else {
+    order = order.filter(o => o.id !== id)
+    if (activeId === id) {
+      activeId = null
+      renderMenu()
+    }
   }
   renderOrder()
 }
 
-// remove item from order by id, then re-render
-function removeItem(id) {
-  order = order.filter(o => o.id !== id)
-  renderOrder()
+// Decrement within the already-open stepper — targeted update; full re-render only if item removed
+function decrementItem(id) {
+  const existing = order.find(o => o.id === id)
+  if (!existing) return
+  if (existing.quantity > 1) {
+    existing.quantity--
+    menuEl.querySelector(`.qty-value[data-id="${id}"]`).textContent = existing.quantity
+    renderOrder()
+  } else {
+    order = order.filter(o => o.id !== id)
+    activeId = null
+    renderMenu()
+    renderOrder()
+  }
 }
 
-// listen for + button clicks on the menu using event delegation
 menuEl.addEventListener('click', e => {
-  const btn = e.target.closest('.btn-add') // find the clicked add button
-  if (!btn) return
-  addItem(Number(btn.dataset.id)) // parse id from data attribute and add item
+  const addBtn = e.target.closest('.btn-add')
+  const incBtn = e.target.closest('.btn-increment')
+  const decBtn = e.target.closest('.btn-decrement')
+  if (addBtn) openItem(Number(addBtn.dataset.id))
+  else if (incBtn) incrementItem(Number(incBtn.dataset.id))
+  else if (decBtn) decrementItem(Number(decBtn.dataset.id))
 })
 
-// listen for remove button clicks inside the order panel
 orderItemsEl.addEventListener('click', e => {
-  const btn = e.target.closest('.btn-remove')
-  if (!btn) return
-  removeItem(Number(btn.dataset.id))
+  const btn = e.target.closest('.btn-order-decrement')
+  if (btn) decrementFromOrder(Number(btn.dataset.id))
 })
 
-// open payment modal and reset the form when complete order is clicked
 completeBtn.addEventListener('click', () => {
-  paymentForm.reset() // clear any previous input
-  modal.showModal() // open the native dialog
+  paymentForm.reset()
+  modal.showModal()
 })
 
-// handle payment form submission
 paymentForm.addEventListener('submit', e => {
-  e.preventDefault() // stop default form navigation
-  if (!paymentForm.reportValidity()) return // trigger browser's built-in required field validation
+  e.preventDefault()
+  if (!paymentForm.reportValidity()) return
 
-  const name = document.getElementById('input-name').value.trim() // read the customer's name
+  const name = document.getElementById('input-name').value.trim()
 
-  modal.close() // close the payment modal
-  orderSection.classList.add('hidden') // hide the order panel
-  successEl.classList.remove('hidden') // show the success message
+  modal.close()
+  orderSection.classList.add('hidden')
+  successEl.classList.remove('hidden')
   successMsg.textContent = `Thanks, ${name}! The order is on its way!`
-  reviewEl.classList.remove('hidden') // reveal the review section below the success message
+  reviewEl.classList.remove('hidden')
 
-  order = [] // reset the cart
-  selectedRating = 0 // reset the star rating for next order
-  setStarLit(0) // clear any lit stars from a previous session
+  order = []
+  activeId = null
+  selectedRating = 0
+  setStarLit(0)
+  renderMenu()
 })
 
-// close modal when clicking on the backdrop
 modal.addEventListener('click', e => {
-  if (e.target === modal) modal.close() // only close when clicking outside the modal card
+  if (e.target === modal) modal.close()
 })
 
-// light up all stars up to the given value, clear the rest
 function setStarLit(upTo) {
   starEls.forEach(star => {
     star.classList.toggle('star--lit', Number(star.dataset.value) <= upTo)
   })
 }
 
-// hover over a star: preview the rating by lighting up stars temporarily
 starRatingEl.addEventListener('mouseover', e => {
   const star = e.target.closest('.star')
   if (!star) return
   setStarLit(Number(star.dataset.value))
 })
 
-// mouse leaves the star group: revert to the locked selection
 starRatingEl.addEventListener('mouseleave', () => {
   setStarLit(selectedRating)
 })
 
-// click a star: lock in the selected rating
 starRatingEl.addEventListener('click', e => {
   const star = e.target.closest('.star')
   if (!star) return
   selectedRating = Number(star.dataset.value)
-  setStarLit(selectedRating) // keep the clicked stars lit
+  setStarLit(selectedRating)
 })
 
-// submit review: hide the review form and show the thank you message
 submitReviewBtn.addEventListener('click', () => {
   reviewEl.classList.add('hidden')
   reviewThanksEl.classList.remove('hidden')
 })
 
-renderMenu() // kick off the app by rendering the menu on page load
+renderMenu()
