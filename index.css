@@ -15,11 +15,27 @@ body {
 #app {
   background: #fff;
   width: 100%;
-  max-width: 390px;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+}
+
+.layout-grid {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.menu-panel {
+  flex: 1;
+}
+
+.order-panel {
+  /* on mobile: natural flow below menu */
+}
+
+.order-empty-hint {
+  display: none;
 }
 
 /* ── Hero ── */
@@ -146,6 +162,10 @@ body {
 #order {
   padding: 24px 20px 20px;
   border-top: 1px solid #f0f0f0;
+}
+
+#menu {
+  flex: 1;
 }
 
 .order-heading {
@@ -501,4 +521,102 @@ dialog::backdrop {
 /* Utility */
 .hidden {
   display: none !important;
+}
+
+/* ── Responsive: tablet & desktop (≥ 768px) ── */
+@media (min-width: 768px) {
+  body {
+    padding: 40px 24px;
+    align-items: flex-start;
+  }
+
+  #app {
+    max-width: 1100px;
+    min-height: auto;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.13);
+  }
+
+  /* Hero: taller & more impactful */
+  .hero {
+    padding: 56px 48px;
+  }
+
+  .hero-text h1 {
+    font-size: 2.4rem;
+  }
+
+  .hero-text p {
+    font-size: 0.95rem;
+  }
+
+  /* Meal deal banner: horizontal */
+  .meal-deal-banner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 32px;
+    gap: 10px;
+    text-align: left;
+  }
+
+  /* Two-column grid */
+  .layout-grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    align-items: start;
+  }
+
+  /* Right panel: sticky & separated */
+  .order-panel {
+    border-left: 1px solid #f0f0f0;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    min-height: 200px;
+  }
+
+  /* Remove top border; left border on panel handles separation */
+  #order {
+    border-top: none;
+  }
+
+  /* Empty state hint — shown only on desktop when panel is empty */
+  .order-empty-hint {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+    color: #ccc;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    min-height: 200px;
+  }
+
+  /* Hide hint when any section inside the panel becomes visible */
+  .order-panel:has(#order:not(.hidden)) .order-empty-hint,
+  .order-panel:has(#success:not(.hidden)) .order-empty-hint,
+  .order-panel:has(#review:not(.hidden)) .order-empty-hint,
+  .order-panel:has(#review-thanks:not(.hidden)) .order-empty-hint {
+    display: none;
+  }
+
+  /* More generous spacing for menu items */
+  .menu-item {
+    padding: 20px 32px;
+  }
+
+  .success-box {
+    margin: 24px;
+  }
+
+  .review-box {
+    margin: 0 24px 24px;
+  }
+
+  .review-thanks-box {
+    margin: 0 24px 24px;
+  }
 }

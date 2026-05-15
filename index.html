@@ -22,41 +22,51 @@
       </div>
 
       <main>
-        <section id="menu"></section>
-
-        <section id="order" class="hidden">
-          <h2 class="order-heading">Your order</h2>
-          <div id="order-items"></div>
-          <div class="order-divider"></div>
-          <div class="order-total-row">
-            <span class="order-total-label">Total price:</span>
-            <span id="order-total" class="order-total-value"></span>
+        <div class="layout-grid">
+          <div class="menu-panel">
+            <section id="menu"></section>
           </div>
-          <button id="complete-order-btn" class="btn-complete">Complete order</button>
-        </section>
 
-        <div id="success" class="hidden success-box">
-          <p id="success-message"></p>
-        </div>
+          <aside class="order-panel">
+            <div class="order-empty-hint">
+              <p>Add items from the menu<br>to start your order.</p>
+            </div>
 
-        <!-- Review section shown after a successful order -->
-        <div id="review" class="hidden review-box">
-          <h3 class="review-heading">How was your experience?</h3>
-          <p class="review-subtext">Your feedback helps us improve for every customer.</p>
-          <div id="star-rating" class="star-rating">
-            <span class="star" data-value="1">★</span>
-            <span class="star" data-value="2">★</span>
-            <span class="star" data-value="3">★</span>
-            <span class="star" data-value="4">★</span>
-            <span class="star" data-value="5">★</span>
-          </div>
-          <textarea id="review-text" class="review-textarea" placeholder="Tell us about your experience..." rows="3"></textarea>
-          <button id="submit-review-btn" class="btn-submit-review">Submit review</button>
-        </div>
+            <section id="order" class="hidden">
+              <h2 class="order-heading">Your order</h2>
+              <div id="order-items"></div>
+              <div class="order-divider"></div>
+              <div class="order-total-row">
+                <span class="order-total-label">Total price:</span>
+                <span id="order-total" class="order-total-value"></span>
+              </div>
+              <button id="complete-order-btn" class="btn-complete">Complete order</button>
+            </section>
 
-        <!-- Confirmation shown after the review is submitted -->
-        <div id="review-thanks" class="hidden review-thanks-box">
-          <p>Thank you for your feedback — we really appreciate it!</p>
+            <div id="success" class="hidden success-box">
+              <p id="success-message"></p>
+            </div>
+
+            <!-- Review section shown after a successful order -->
+            <div id="review" class="hidden review-box">
+              <h3 class="review-heading">How was your experience?</h3>
+              <p class="review-subtext">Your feedback helps us improve for every customer.</p>
+              <div id="star-rating" class="star-rating">
+                <span class="star" data-value="1">★</span>
+                <span class="star" data-value="2">★</span>
+                <span class="star" data-value="3">★</span>
+                <span class="star" data-value="4">★</span>
+                <span class="star" data-value="5">★</span>
+              </div>
+              <textarea id="review-text" class="review-textarea" placeholder="Tell us about your experience..." rows="3"></textarea>
+              <button id="submit-review-btn" class="btn-submit-review">Submit review</button>
+            </div>
+
+            <!-- Confirmation shown after the review is submitted -->
+            <div id="review-thanks" class="hidden review-thanks-box">
+              <p>Thank you for your feedback — we really appreciate it!</p>
+            </div>
+          </aside>
         </div>
       </main>
 
